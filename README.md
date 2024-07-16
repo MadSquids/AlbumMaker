@@ -17,6 +17,6 @@ Place the AlbumMaker.exe file in the same folder as the songs you want to add th
 Launch the .exe and follow the instructions in the command prompt.
 
 ## Compatibility:
-The .exe file will only work on Windows. The source code is included if you want to compile it for Mac or Linux. AlbumMaker.py is the main file that calls the other 3.\
+The .exe file will only work on Windows. The source code is included if you want to compile it for Mac or Linux. AlbumMaker.py is the main file that calls the other 3.
 Additionally, you can use the other 3 Python files individually allowing for more specific use cases.
 	
