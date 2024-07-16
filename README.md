@@ -1,6 +1,6 @@
 # AlbumMaker
  
-A simple collection of Python scripts to help edit the metadata for mp3 and m4a files.
+A collection of Python scripts to edit the metadata for mp3 and m4a files.
 ## Features include:
  - Adding playlist track number. (filename format required "[tracknumber] - [rest of filename]") Example 01 - Killer Queen.m4a\
 Will auto-remove the track number from the filename upon adding it to the metadata.
