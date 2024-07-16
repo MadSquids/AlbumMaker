@@ -1,4 +1,4 @@
-# SongDetailFixer
+# AlbumMaker
  
 A simple collection of Python scripts to help edit the metadata for mp3 and m4a files.
 ## Features include:
