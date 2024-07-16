@@ -19,9 +19,11 @@ def main():
     # Ask for artist and album name.
     artist = input("Enter the artist name: ")
     album = input("Enter the album name: ")
+    genre = input("Enter the genre: ")
+    year = input("Enter the year: ")
     
     # Run SongDetailsAdder.py
-    SongDetailsAdder.addSongDetails(artist, album, path)
+    SongDetailsAdder.addSongDetails(artist, album, genre, year, path)
 
     # Creat a new folder named after the album
     albumFolder = os.path.join(path, album)
