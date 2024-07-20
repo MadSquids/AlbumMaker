@@ -9,8 +9,12 @@ def main():
     # Get current working directory
     path = os.getcwd()
     
-    # Run PlaylistIndexer.py
-    PlaylistIndexer.updateTrackNumber(path)
+    # Ask if indexer should be run.
+    doIndex = input("Should Playlist Track Number be added? (Yes/No): ")
+
+    if doIndex == "Yes":
+        # Run PlaylistIndexer.py
+        PlaylistIndexer.updateTrackNumber(path)
     
     # Run FileNameRemover.py
     stringsRemove = FileNameRemover.askStrings()
