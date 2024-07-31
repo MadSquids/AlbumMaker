@@ -1,5 +1,5 @@
 # AlbumMaker
- 
+[![Latest Release](https://img.shields.io/github/v/release/MadSquids/AlbumMaker?style=for-the-badge)](https://github.com/MadSquids/AlbumMaker/releases/latest)\
 A Python-based program to quickly and easily edit the metadata, and clean up filenames for mp3 and m4a files.\
 Designed to be used on albums.
 ## Features include:
