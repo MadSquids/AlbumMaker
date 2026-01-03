@@ -135,8 +135,8 @@ def main():
     path = os.getcwd()
 
     # --- YouTube download skipped for test ---
-    #url = input("Enter YouTube playlist/video URL: ")
-    #Downloader.downloadPlaylist(url, path)
+    url = input("Enter YouTube playlist/video URL: ")
+    Downloader.downloadPlaylist(url, path)
 
     # --- MusicBrainz lookup ---
     selected = None
