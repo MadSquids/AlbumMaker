@@ -3,9 +3,11 @@ import re
 import requests
 import musicbrainzngs
 import SongDetailsAdder
-import Downloader  # commented out for test mode
+import Downloader
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-musicbrainzngs.set_useragent("AlbumMaker", "1.0", "youremail@example.com")
+musicbrainzngs.set_useragent("AlbumMaker", "1.0", "madsquidsdisease@gmail.com")
 
 # --- MusicBrainz helper functions ---
 
@@ -112,22 +114,33 @@ def renameTracks(folderPath, trackList, artist):
             os.rename(original_path, new_path)
             best_match["filename"] = new_filename
 
-def downloadCoverArt(release_id, outputDir):
-    """Download album cover art from Cover Art Archive."""
-    url = f"https://coverartarchive.org/release/{release_id}/front"
+def downloadCoverArt(releaseId, outputDir):
+    url = f"https://coverartarchive.org/release/{releaseId}/front"
+
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504]
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+
     try:
-        r = requests.get(url)
-        if r.status_code == 200:
-            coverPath = os.path.join(outputDir, "cover.jpg")
-            with open(coverPath, "wb") as f:
-                f.write(r.content)
-            print(f"Downloaded cover art to {coverPath}")
-            return coverPath
-        else:
-            print("No cover art found for this release.")
+        response = session.get(url, timeout=15)
+        response.raise_for_status()
     except Exception as e:
-        print("Cover download failed:", e)
-    return None
+        print(f"Cover download failed: {e}")
+        return None
+
+    coverPath = os.path.join(outputDir, "cover.jpg")
+    with open(coverPath, "wb") as f:
+        f.write(response.content)
+
+    print(f"Downloaded cover art to {coverPath}")
+    return coverPath
+
+def sanitizeFileName(name):
+    return re.sub(r'[\\/:*?"<>|]', '', name).strip()
 
 # --- Main script ---
 
@@ -160,12 +173,8 @@ def main():
         album = selected["title"]
         year = selected.get("date", "")
 
-        # Safe genre handling with fallback to user input
-        tagList = selected.get("tag-list", [])
-        if tagList:
-            genre = tagList[0].get("name", "")
-        else:
-            genre = input("No genre found for this release. Enter genre manually: ")
+        # Request genre
+        genre = input("Enter genre: ")
 
         release_id = selected["id"]
 
@@ -182,10 +191,13 @@ def main():
         trackList = [{"number": i+1, "title": os.path.splitext(f)[0], "filename": f} for i, f in enumerate(files)]
 
     # --- Add metadata ---
-    SongDetailsAdder.addSongDetails(artist, album, genre, year, path, trackList=trackList, coverPath=coverPath)
+    explicitInput = input("Is this album explicit? (Yes/No): ").strip().lower()
+    isExplicit = explicitInput == "yes"
+    SongDetailsAdder.addSongDetails(artist, album, genre, year, path, trackList=trackList, coverPath=coverPath, isExplicit=isExplicit)
 
     # --- Move to album folder ---
-    albumFolder = os.path.join(path, album)
+    safeAlbumName = sanitizeFileName(album)
+    albumFolder = os.path.join(path, safeAlbumName)
     os.makedirs(albumFolder, exist_ok=True)
     for track in trackList:
         src = os.path.join(path, track["filename"])

@@ -1,7 +1,7 @@
 import os
 from mutagen.mp4 import MP4, MP4Cover
 
-def addSongDetails(artist, album, genre, year, folderPath, trackList, coverPath=None):
+def addSongDetails(artist, album, genre, year, folderPath, trackList, coverPath=None, isExplicit=False):
     """
     Update metadata for all .m4a files using MusicBrainz track numbers.
     trackList: [{"number": 1, "title": "Song Name", "filename": "DownloadedFile.m4a"}]
@@ -25,6 +25,10 @@ def addSongDetails(artist, album, genre, year, folderPath, trackList, coverPath=
         audio["\xa9day"] = year
         audio["\xa9nam"] = track["title"]  # clean title
         audio["trkn"] = [(track["number"], 0)]  # MusicBrainz track number
+        if isExplicit:
+            audio["rtng"] = [1]   # Explicit 🅴
+        else:
+            audio["rtng"] = [0]   # Not rated
 
         # Embed cover art
         if coverPath and os.path.exists(coverPath):
