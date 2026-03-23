@@ -1,15 +1,11 @@
 import os
 from mutagen.mp4 import MP4, MP4Cover
 
-def addSongDetails(artist, album, genre, year, folderPath, trackList, coverPath=None, isExplicit=False):
-    """
-    Update metadata for all .m4a files using MusicBrainz track numbers.
-    trackList: [{"number": 1, "title": "Song Name", "filename": "DownloadedFile.m4a"}]
-    """
-    for idx, track in enumerate(trackList):
+def addSongDetails(folderPath, artist, album, genre, year, trackList, coverPath):
+    for track in trackList:
         filename = track.get("filename")
         if not filename:
-            continue  # skip missing files
+            continue
 
         filePath = os.path.join(folderPath, filename)
         if not os.path.exists(filePath):
@@ -17,20 +13,18 @@ def addSongDetails(artist, album, genre, year, folderPath, trackList, coverPath=
             continue
 
         audio = MP4(filePath)
-
-        # Metadata
         audio["\xa9ART"] = artist
         audio["\xa9alb"] = album
         audio["\xa9gen"] = genre
         audio["\xa9day"] = year
-        audio["\xa9nam"] = track["title"]  # clean title
-        audio["trkn"] = [(track["number"], 0)]  # MusicBrainz track number
-        if isExplicit:
-            audio["rtng"] = [1]   # Explicit 🅴
-        else:
-            audio["rtng"] = [0]   # Not rated
+        audio["\xa9nam"] = track["title"]
+        audio["trkn"] = [(track["number"], 0)]
 
-        # Embed cover art
+        if track.get("isExplicit", False):
+            audio["rtng"] = [1]  # Explicit
+        else:
+            audio["rtng"] = [0]  # Not explicit
+
         if coverPath and os.path.exists(coverPath):
             with open(coverPath, "rb") as img:
                 audio["covr"] = [MP4Cover(img.read(), imageformat=MP4Cover.FORMAT_JPEG)]

@@ -1,5 +1,6 @@
-import yt_dlp
+import yt_dlp # type: ignore
 import os
+import shutil
 
 def downloadPlaylist(url, outputDir):
     """
@@ -10,10 +11,19 @@ def downloadPlaylist(url, outputDir):
 
     os.makedirs(outputDir, exist_ok=True)
 
+    useCustom = input("Use custom yt-dlp format? (Y/N): ").strip().lower()
+
+    if useCustom == "y":
+        formatString = input("Enter yt-dlp format string (ex: 234 or m4a/bestaudio/best): ").strip()
+    else:
+        formatString = "m4a/bestaudio/best"  # your default
+
     ydl_opts = {
-        'format': 'bestaudio/best',
+        'format': formatString,
         'outtmpl': os.path.join(outputDir, '%(title)s.%(ext)s'),
         'noplaylist': False,  # download full playlist if URL is one
+        'ffmpeg_location': shutil.which("ffmpeg"),
+        'force_ipv4': True,
         'postprocessors': [
             {   # Extract audio
                 'key': 'FFmpegExtractAudio',
